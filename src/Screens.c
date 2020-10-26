@@ -1750,16 +1750,6 @@ static void DisconnectScreen_UpdateReconnect(struct DisconnectScreen* s) {
 	int elapsed, secsLeft;
 	String_InitArray(msg, msgBuffer);
 
-	if (s->canReconnect) {
-		elapsed  = (int)(Game.Time - s->initTime);
-		secsLeft = DISCONNECT_DELAY_SECS - elapsed;
-
-		if (secsLeft > 0) {
-			String_Format1(&msg, "Reconnect in %i", &secsLeft);
-		}
-		s->reconnect.disabled = secsLeft > 0;
-	}
-
 	if (!msg.length) String_AppendConst(&msg, "Reconnect");
 	ButtonWidget_Set(&s->reconnect, &msg, &s->titleFont);
 }
