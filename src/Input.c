@@ -685,33 +685,75 @@ static void DoDeleteBlock(void) {
 	/* always play delete animations, even if we aren't deleting a block */
 	HeldBlockRenderer_ClickAnim(true);
 
-	pos = Game_SelectedPos.pos;
-	if (!Game_SelectedPos.Valid || !World_Contains(pos.X, pos.Y, pos.Z)) return;
+	if (Options_GetBool(OPT_MOD_INTER, false)) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				for (int k = 0; k < 3; k++) {
+					pos = Game_SelectedPos.pos;
+					if (!Game_SelectedPos.Valid || !World_Contains(pos.X + i, pos.Y - j, pos.Z + k)) break;
 
-	old = World_GetBlock(pos.X, pos.Y, pos.Z);
-	if (Blocks.Draw[old] == DRAW_GAS || !Blocks.CanDelete[old]) return;
+					old = World_GetBlock(pos.X + i, pos.Y - j, pos.Z + k);
+					if (Blocks.Draw[old] == DRAW_GAS || !Blocks.CanDelete[old]) break;
 
-	Game_ChangeBlock(pos.X, pos.Y, pos.Z, BLOCK_AIR);
-	Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, BLOCK_AIR);
+					Game_ChangeBlock(pos.X + i, pos.Y - j, pos.Z + k, BLOCK_AIR);
+					Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, BLOCK_AIR);
+				}
+			}
+		}
+	} else {
+		pos = Game_SelectedPos.pos;
+		if (!Game_SelectedPos.Valid || !World_Contains(pos.X, pos.Y, pos.Z)) return;
+
+		old = World_GetBlock(pos.X, pos.Y, pos.Z);
+		if (Blocks.Draw[old] == DRAW_GAS || !Blocks.CanDelete[old]) return;
+
+		Game_ChangeBlock(pos.X, pos.Y, pos.Z, BLOCK_AIR);
+		Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, BLOCK_AIR);
+	}
 }
 
 static void DoPlaceBlock(void) {
 	IVec3 pos;
 	BlockID old, block;
-	pos = Game_SelectedPos.TranslatedPos;
-	if (!Game_SelectedPos.Valid || !World_Contains(pos.X, pos.Y, pos.Z)) return;
 
-	old   = World_GetBlock(pos.X, pos.Y, pos.Z);
-	block = Inventory_SelectedBlock;
-	if (AutoRotate_Enabled) block = AutoRotate_RotateBlock(block);
+	if (Options_GetBool(OPT_MOD_INTER, false)) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				for (int k = 0; k < 3; k++) {
+					pos = Game_SelectedPos.TranslatedPos;
+					if (!Game_SelectedPos.Valid || !World_Contains(pos.X + i, pos.Y + j, pos.Z + k)) break;
 
-	if (Game_CanPick(old) || !Blocks.CanPlace[block]) return;
-	/* air-ish blocks can only replace over other air-ish blocks */
-	if (Blocks.Draw[block] == DRAW_GAS && Blocks.Draw[old] != DRAW_GAS) return;
-	if (!CheckIsFree(block)) return;
+					old   = World_GetBlock(pos.X + i, pos.Y + j, pos.Z + k);
+					block = Inventory_SelectedBlock;
+					if (AutoRotate_Enabled) block = AutoRotate_RotateBlock(block);
 
-	Game_ChangeBlock(pos.X, pos.Y, pos.Z, block);
-	Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, block);
+					if (Game_CanPick(old) || !Blocks.CanPlace[block]) break;
+					/* air-ish blocks can only replace over other air-ish blocks */
+					if (Blocks.Draw[block] == DRAW_GAS && Blocks.Draw[old] != DRAW_GAS) break;
+					if (!CheckIsFree(block)) break;
+
+					Game_ChangeBlock(pos.X + i, pos.Y + j, pos.Z + k, block);
+					Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, block);
+				}
+			}
+		}
+	} else {
+		pos = Game_SelectedPos.TranslatedPos;
+		if (!Game_SelectedPos.Valid || !World_Contains(pos.X, pos.Y, pos.Z)) return;
+
+		old   = World_GetBlock(pos.X, pos.Y, pos.Z);
+		block = Inventory_SelectedBlock;
+		if (AutoRotate_Enabled) block = AutoRotate_RotateBlock(block);
+
+		if (Game_CanPick(old) || !Blocks.CanPlace[block]) return;
+		/* air-ish blocks can only replace over other air-ish blocks */
+		if (Blocks.Draw[block] == DRAW_GAS && Blocks.Draw[old] != DRAW_GAS) return;
+		if (!CheckIsFree(block)) return;
+
+		Game_ChangeBlock(pos.X, pos.Y, pos.Z, block);
+		Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, block);
+	}
+
 }
 
 static void DoPickBlock(void) {

@@ -184,6 +184,7 @@ static void Menu_SwitchKeysHacks(void* a, void* b)        { HacksKeyBindingsScre
 static void Menu_SwitchKeysOther(void* a, void* b)        { OtherKeyBindingsScreen_Show(); }
 static void Menu_SwitchKeysMouse(void* a, void* b)        { MouseKeyBindingsScreen_Show(); }
 
+static void Menu_SwitchMod(void* a, void* b)       { ModOptionsScreen_Show(); }
 static void Menu_SwitchMisc(void* a, void* b)      { MiscOptionsScreen_Show(); }
 static void Menu_SwitchChat(void* a, void* b)      { ChatOptionsScreen_Show(); }
 static void Menu_SwitchGui(void* a, void* b)       { GuiOptionsScreen_Show(); }
@@ -583,21 +584,23 @@ static struct OptionsGroupScreen {
 	Screen_Body
 	int selectedI;
 	struct FontDesc textFont;
-	struct ButtonWidget btns[8];
+	struct ButtonWidget btns[9];
 	struct TextWidget desc;
 	struct ButtonWidget done;
 } OptionsGroupScreen;
 
-static struct Widget* optGroups_widgets[10] = {
+static struct Widget* optGroups_widgets[11] = {
 	(struct Widget*)&OptionsGroupScreen.btns[0], (struct Widget*)&OptionsGroupScreen.btns[1],
 	(struct Widget*)&OptionsGroupScreen.btns[2], (struct Widget*)&OptionsGroupScreen.btns[3],
 	(struct Widget*)&OptionsGroupScreen.btns[4], (struct Widget*)&OptionsGroupScreen.btns[5],
 	(struct Widget*)&OptionsGroupScreen.btns[6], (struct Widget*)&OptionsGroupScreen.btns[7],
+	(struct Widget*)&OptionsGroupScreen.btns[8],
 	(struct Widget*)&OptionsGroupScreen.desc,    (struct Widget*)&OptionsGroupScreen.done
 };
-#define OPTGROUPS_MAX_VERTICES (8 * BUTTONWIDGET_MAX + TEXTWIDGET_MAX + BUTTONWIDGET_MAX)
+#define OPTGROUPS_MAX_VERTICES (9 * BUTTONWIDGET_MAX + TEXTWIDGET_MAX + BUTTONWIDGET_MAX)
 
-static const char* const optsGroup_descs[8] = {
+static const char* const optsGroup_descs[9] = {
+	"&eCum in my ass uwu",
 	"&eMusic/Sound, view bobbing, and more",
 	"&eGui scale, font settings, and more",
 	"&eFPS limit, view distance, entity names/shadows",
@@ -607,7 +610,8 @@ static const char* const optsGroup_descs[8] = {
 	"&eEnv colours, water level, weather, and more",
 	"&eSettings for resembling the original classic",
 };
-static const struct SimpleButtonDesc optsGroup_btns[8] = {
+static const struct SimpleButtonDesc optsGroup_btns[9] = {
+	{ -160, -150, "Mod options...",       Menu_SwitchMod        },
 	{ -160, -100, "Misc options...",      Menu_SwitchMisc       },
 	{ -160,  -50, "Gui options...",       Menu_SwitchGui        },
 	{ -160,    0, "Graphics options...",  Menu_SwitchGfx        },
@@ -642,7 +646,7 @@ static void OptionsGroupScreen_ContextRecreated(void* screen) {
 	Menu_MakeTitleFont(&titleFont);
 	Menu_MakeBodyFont(&s->textFont);
 
-	Menu_SetButtons(s->btns, &titleFont, optsGroup_btns, 8);
+	Menu_SetButtons(s->btns, &titleFont, optsGroup_btns, 9);
 	ButtonWidget_SetConst(&s->done, "Done", &titleFont);
 
 	if (s->selectedI >= 0) OptionsGroupScreen_UpdateDesc(s);
@@ -652,7 +656,7 @@ static void OptionsGroupScreen_ContextRecreated(void* screen) {
 
 static void OptionsGroupScreen_Layout(void* screen) {
 	struct OptionsGroupScreen* s = (struct OptionsGroupScreen*)screen;
-	Menu_LayoutButtons(s->btns, optsGroup_btns, 8);
+	Menu_LayoutButtons(s->btns, optsGroup_btns, 9);
 	Widget_SetLocation(&s->desc, ANCHOR_CENTRE, ANCHOR_CENTRE, 0, 100);
 	Menu_LayoutBack(&s->done);
 }
@@ -666,7 +670,7 @@ static void OptionsGroupScreen_Init(void* screen) {
 	s->selectedI   = -1;
 	s->maxVertices = OPTGROUPS_MAX_VERTICES;
 
-	Menu_InitButtons(s->btns, 300, optsGroup_btns, 8);
+	Menu_InitButtons(s->btns, 300, optsGroup_btns, 9);
 	TextWidget_Init(&s->desc);
 	Menu_InitBack(&s->done, Menu_SwitchPause);
 }
@@ -2974,6 +2978,39 @@ void MiscOptionsScreen_Show(void) {
 #endif
 
 	MenuOptionsScreen_Show(descs, NULL, 0, MiscSettingsScreen_InitWidgets);
+}
+
+
+/*########################################################################################################################*
+*----------------------------------------------------ModOptionsScreen----------------------------------------------------*
+*#########################################################################################################################*/
+static void ModOptionsScreen_GetInter(cc_string* v) {
+	Menu_GetBool(v, Options_GetBool(OPT_MOD_INTER, false));
+}
+static void ModOptionsScreen_SetInter(const cc_string* v) {
+	Menu_SetBool(v, OPT_MOD_INTER);
+}
+
+static void ModOptionsScreen_GetPlaceholder(cc_string* v) { Menu_GetBool(v, true); }
+static void ModOptionsScreen_SetPlaceholder(const cc_string* v) { }
+
+static void ModSettingsScreen_InitWidgets(struct MenuOptionsScreen* s) {
+	static const struct MenuOptionDesc buttons[2] = {
+		{ -1,  -150, "3x3 interactions", MenuOptionsScreen_Bool,
+			ModOptionsScreen_GetInter, ModOptionsScreen_SetInter },
+
+		{ 1,   -150, "Cum", MenuOptionsScreen_Bool,
+			ModOptionsScreen_GetPlaceholder, ModOptionsScreen_SetPlaceholder }
+	};
+	s->numCore = 2;
+	MenuOptionsScreen_InitButtons(s, buttons, Array_Elems(buttons), Menu_SwitchOptions);
+}
+
+void ModOptionsScreen_Show(void) {
+	static struct MenuInputDesc descs[2];
+	static const char* extDescs[Array_Elems(descs)];
+
+	MenuOptionsScreen_Show(descs, extDescs, 0, ModSettingsScreen_InitWidgets);
 }
 
 
