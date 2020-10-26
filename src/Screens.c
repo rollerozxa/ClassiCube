@@ -71,20 +71,20 @@ static struct HUDScreen {
 static void HUDScreen_MakeText(struct HUDScreen* s, cc_string* status) {
 	int indices, ping;
 	s->fps = (int)(s->frames / s->accumulator);
-	String_Format1(status, "%i fps, ", &s->fps);
+	String_Format1(status, "%i fps, I'm a filthy hacker, punish me uwu", &s->fps);
 
 	if (Game_ClassicMode) {
 		String_Format1(status, "%i chunk updates", &Game.ChunkUpdates);
 	} else {
-		if (Game.ChunkUpdates) {
-			String_Format1(status, "%i chunks/s, ", &Game.ChunkUpdates);
-		}
+		//if (Game.ChunkUpdates) {
+		//	String_Format1(status, "%i chunks/s, ", &Game.ChunkUpdates);
+		//}
 
-		indices = ICOUNT(Game_Vertices);
-		String_Format1(status, "%i vertices", &indices);
+		//indices = ICOUNT(Game_Vertices);
+		//String_Format1(status, "%i vertices", &indices);
 
-		ping = Ping_AveragePingMS();
-		if (ping) String_Format1(status, ", ping %i ms", &ping);
+		//ping = Ping_AveragePingMS();
+		//if (ping) String_Format1(status, ", ping %i ms", &ping);
 	}
 }
 
