@@ -694,6 +694,7 @@ static void DoDeleteBlock(void) {
 
 					old = World_GetBlock(pos.X + i, pos.Y - j, pos.Z + k);
 					if (Blocks.Draw[old] == DRAW_GAS || !Blocks.CanDelete[old]) break;
+					if (Options_GetInt(OPT_MOD_BLOCKID, 0, 255, 0) != 0 && old != Options_GetInt(OPT_MOD_BLOCKID, 0, 255, 0)) break;
 
 					Game_ChangeBlock(pos.X + i, pos.Y - j, pos.Z + k, BLOCK_AIR);
 					Event_RaiseBlock(&UserEvents.BlockChanged, pos, old, BLOCK_AIR);

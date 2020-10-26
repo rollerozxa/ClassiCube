@@ -2991,6 +2991,13 @@ static void ModOptionsScreen_SetInter(const cc_string* v) {
 	Menu_SetBool(v, OPT_MOD_INTER);
 }
 
+static void ModOptionsScreen_GetBreakID(cc_string* v) {
+	//Options_GetInt(OPT_MOD_BLOCKID, v, 0);
+}
+static void ModOptionsScreen_SetBreakID(const cc_string* v) {
+	Options_Set(OPT_MOD_BLOCKID, v);
+}
+
 static void ModOptionsScreen_GetPlaceholder(cc_string* v) { Menu_GetBool(v, true); }
 static void ModOptionsScreen_SetPlaceholder(const cc_string* v) { }
 
@@ -2999,8 +3006,8 @@ static void ModSettingsScreen_InitWidgets(struct MenuOptionsScreen* s) {
 		{ -1,  -150, "3x3 interactions", MenuOptionsScreen_Bool,
 			ModOptionsScreen_GetInter, ModOptionsScreen_SetInter },
 
-		{ 1,   -150, "Cum", MenuOptionsScreen_Bool,
-			ModOptionsScreen_GetPlaceholder, ModOptionsScreen_SetPlaceholder }
+		{ 1,   -150, "Only break block ID", MenuOptionsScreen_Input,
+			ModOptionsScreen_GetBreakID, ModOptionsScreen_SetBreakID }
 	};
 	s->numCore = 2;
 	MenuOptionsScreen_InitButtons(s, buttons, Array_Elems(buttons), Menu_SwitchOptions);

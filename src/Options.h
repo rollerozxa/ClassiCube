@@ -70,6 +70,7 @@
 #define OPT_GRAB_CURSOR "win-grab-cursor"
 
 #define OPT_MOD_INTER "3x-interact"
+#define OPT_MOD_BLOCKID "break-block-id"
 
 struct StringsBuffer;
 extern struct StringsBuffer Options;
